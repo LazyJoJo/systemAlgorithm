@@ -1,4 +1,4 @@
-package com.ruijie.cpu.entity;
+package com.ruijie.cpu.entity.config;
 
 
 import lombok.Data;
@@ -22,6 +22,8 @@ public class ConfigInfo implements Comparable<ConfigInfo>{
     private String topLevel;   // 跑用例的级别
     private String normalRfMail;   // 正常用例是否发邮件
     private String singleCaseTag;  // 单个用例标签
+    private String gcovParam;  // gcov 需要的运行参数
+    private String taskId;   // 任务id（组件化任务特有）
 
 
     private int caseCount; //用例个数
@@ -43,20 +45,44 @@ public class ConfigInfo implements Comparable<ConfigInfo>{
         if("1".equals(this.valgrindFunc)){
             ans+="python D:\\CI\\autotest\\resource\\testbedlib\\valgrind_open_ability.py\n";
         }
+        if("2".equals(this.valgrindFunc)){
+            ans+="D:\\CI\\autotest\\case\\public\\gcov\\GCOV\\upload_gcovso.py x86\n";
+        }
 
         //执行用例部分
         ans+="set autotest=D:\\CI\\autotest\n";
         ans+="set jenkins=%autotest%\\execution\\jenkins\n";
         ans+="python D:\\CI\\autotest\\resource\\testbedlib\\start_task.py %JOB_NAME% %autotest% %jenkins% "+callIp+"\n";
 
-        // 邮件部分
-        if("1".equals(this.normalRfMail)){
-            ans+="call  D:\\CI\\autotest\\resource\\testbedlib\\automail.bat SWITCH\n";
+        if("2".equals(this.valgrindFunc)){
+            ans+="D:\\CI\\autotest\\case\\public\\gcov\\GCOV\\gcov_com_auto_run.py "+ gcovParam+"\n";
         }
-        if ("1".equals(this.valgrindMail)){
-            ans+="set autoSubmitBug=1\n"+
-                    "call python D:\\CI\\autotest\\resource\\testbedlib\\valgrind_automail.py %autoSubmitBug%\n";
+
+        // 组件化运行
+        if(taskId!=null){
+            if("1".equals(this.normalRfMail)){
+                ans+="set taskId="+taskId+"\n";
+                ans+="call  D:\\CI\\autotest\\resource\\testbedlib\\automail.bat SWITCH \n";
+            }
+            if("1".equals(this.valgrindMail)){
+                ans+=   "set autoSubmitBug=0\n"+
+                        "set taskId="+taskId+"\n"+
+                        "call python D:\\CI\\autotest\\resource\\testbedlib\\valgrind_automail.py %autoSubmitBug% \n";
+            }
+
+            // 平时正常运行部分
+        }else{
+            if("1".equals(this.normalRfMail)){
+                ans+="call  D:\\CI\\autotest\\resource\\testbedlib\\automail.bat SWITCH\n";
+            }
+            if("1".equals(this.valgrindMail)){
+                ans+="set autoSubmitBug=0\n"+
+                        "call python D:\\CI\\autotest\\resource\\testbedlib\\valgrind_automail.py %autoSubmitBug%\n";
+            }
         }
+
+
+
         ans+="python D:\\CI\\autotest\\resource\\testbedlib\\callBg.py callTaskBack %NODE_NAME% %JOB_NAME% "+ callIp+"\n";
 //        System.out.println(callIp);
         return ans;

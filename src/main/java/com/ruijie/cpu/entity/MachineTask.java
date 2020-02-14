@@ -83,7 +83,7 @@ public class MachineTask {
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "tid")  //本表中外健名称
-            UserTask userTask;
+    private UserTask userTask;
 
     //取消掉machinePool ，这边的功能用不到
 

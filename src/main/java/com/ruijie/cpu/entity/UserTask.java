@@ -80,7 +80,7 @@ public class UserTask implements Cloneable{
     @Column(name = "machine_num" , length = 64)
     private String machineNum;  //占用机子数量 ---系统自动分配 （不记录具体的机器，可以通过查询获得，只记录数量，回收了数量就减掉）
     @Column(name = "task_success" , length = 64)
-    private String taskSuccess;  //当前机器池是否满足需求（未达成时，分析并调整规划）
+    private String taskSuccess;  //当前机器池是否满足需求（未达成时，分析并调整规划）；
     @Column(name = "machine_type",length = 64)
     private String machineType;   //机器类别，x86-64 等
     @Column(name="method_type",length = 16)
@@ -94,8 +94,9 @@ public class UserTask implements Cloneable{
     @Column(name = "task_id",length = 64)
     private String taskId;   //组件化任务触发过来的关联id
 
-    @Transient
-    private Map<String, List<RfCase>> rfcaseMap;
+    @Column(name = "gcov_param",length = 1024)
+    private String gcovParam;   //gcov相关参数
+
 
 
 //    @OneToMany(mappedBy="userTask", cascade={CascadeType.MERGE,CascadeType.PERSIST}, fetch = FetchType.EAGER, orphanRemoval = true) //外健交给多方维护
